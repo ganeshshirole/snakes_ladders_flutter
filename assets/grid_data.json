@@ -1,0 +1,154 @@
+{
+  "gridData": [
+    {
+      "position": 21,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 22,
+      "isSnake": true,
+      "isLadder": false,
+      "goToPosition": 20
+    },
+    {
+      "position": 23,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 24,
+      "isSnake": true,
+      "isLadder": false,
+      "goToPosition": 16
+    },
+    {
+      "position": 25,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 20,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 19,
+      "isSnake": true,
+      "isLadder": false,
+      "goToPosition": 8
+    },
+    {
+      "position": 18,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 17,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 16,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 11,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 12,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 13,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 14,
+      "isSnake": true,
+      "isLadder": false,
+      "goToPosition": 4
+    },
+    {
+      "position": 15,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 10,
+      "isSnake": false,
+      "isLadder": true,
+      "goToPosition": 12
+    },
+    {
+      "position": 9,
+      "isSnake": false,
+      "isLadder": true,
+      "goToPosition": 18
+    },
+    {
+      "position": 8,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 7,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 6,
+      "isSnake": false,
+      "isLadder": true,
+      "goToPosition": 17
+    },
+    {
+      "position": 1,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 2,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 3,
+      "isSnake": false,
+      "isLadder": true,
+      "goToPosition": 11
+    },
+    {
+      "position": 4,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    },
+    {
+      "position": 5,
+      "isSnake": false,
+      "isLadder": false,
+      "goToPosition": 0
+    }
+  ]
+}
