@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:snakes_ladders/model/GridData.dart';
+import 'package:snakes_ladders/model/grid_data.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter Game',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -21,15 +23,9 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   var player1Pos = 1;
   var player2Pos = 1;
 
@@ -97,14 +93,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       )
                     ],
                   ),
-                  Image.asset(
-                    'images/dice3d.webp',
-                    fit: BoxFit.fitHeight,
-                    height: 50,
-                  ),
+                  Dice(),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text('Player 1'),
+                    child: Text(
+                      'Player 1',
+                      style: TextStyle(fontSize: 18.0, color: Colors.blue),
+                    ),
                   )
                 ],
               );
@@ -122,5 +117,51 @@ class _MyHomePageState extends State<MyHomePage> {
       print(gridItem.position.toString() + "\n");
     }*/
     return gridData;
+  }
+}
+
+class Dice extends StatefulWidget {
+  @override
+  DiceState createState() => DiceState();
+}
+
+class DiceState extends State<Dice> {
+  var randomNumber = 0;
+  var diceAnimationCounter = 0;
+  var rnd = new Random();
+  var diceIcons = [
+    'images/one.webp',
+    'images/two.webp',
+    'images/three.webp',
+    'images/four.webp',
+    'images/five.webp',
+    'images/six.webp'
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: startTimeout,
+      child: Image.asset(
+        diceIcons[randomNumber],
+        height: 80.0,
+      ),
+    );
+  }
+
+  startTimeout() async {
+    var duration = const Duration(milliseconds: 100);
+    Timer.periodic(duration, (Timer t) => handleTimeout(t));
+  }
+
+  void handleTimeout(timer) {
+    setState(() {
+      randomNumber = rnd.nextInt(5);
+    });
+    if (diceAnimationCounter > 10) {
+      diceAnimationCounter = 0;
+      timer.cancel();
+    } else
+      diceAnimationCounter++;
   }
 }

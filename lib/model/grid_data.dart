@@ -1,4 +1,4 @@
-import 'package:snakes_ladders/model/GridItem.dart';
+import 'package:snakes_ladders/model/grid_item.dart';
 
 class GridData {
   List<GridItem> gridItems;
