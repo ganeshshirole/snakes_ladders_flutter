@@ -24,10 +24,29 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  StateSetter gridState;
+  StateSetter diceState;
+  StateSetter playerLabelState;
+
   final String title;
   var player1Pos = 1;
   var player2Pos = 1;
+
+  var isRunning = false;
+  var randomNumber = 0;
+  var player1 = true;
+  var diceAnimationCounter = 0;
+  var rnd = new Random();
+  var diceIcons = [
+    'images/one.webp',
+    'images/two.webp',
+    'images/three.webp',
+    'images/four.webp',
+    'images/five.webp',
+    'images/six.webp'
+  ];
+
+  MyHomePage({Key key, this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -50,56 +69,74 @@ class MyHomePage extends StatelessWidget {
                   Stack(
                     children: <Widget>[
                       Image.asset('images/snakes_ladders_game_background.webp'),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        itemBuilder: (context, position) {
-                          return Container(
-                            child: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Visibility(
-                                    visible: player1Pos ==
-                                        snapshot
-                                            .data.gridItems[position].position,
-                                    child: SvgPicture.asset(
-                                      'vectors/pawn1.svg',
-                                      fit: BoxFit.fitHeight,
-                                      width:
-                                          (MediaQuery.of(context).size.width /
-                                              11),
+                      StatefulBuilder(builder:
+                          (BuildContext context, StateSetter setState) {
+                        gridState = setState;
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          itemBuilder: (context, position) {
+                            return Container(
+                              child: Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Visibility(
+                                      visible: player1Pos ==
+                                          snapshot.data.gridItems[position]
+                                              .position,
+                                      child: SvgPicture.asset(
+                                        'vectors/pawn1.svg',
+                                        fit: BoxFit.fitHeight,
+                                        width:
+                                            (MediaQuery.of(context).size.width /
+                                                11),
+                                      ),
                                     ),
-                                  ),
-                                  Visibility(
-                                    visible: player2Pos ==
-                                        snapshot
-                                            .data.gridItems[position].position,
-                                    child: SvgPicture.asset(
-                                      'vectors/pawn2.svg',
-                                      fit: BoxFit.fitHeight,
-                                      height:
-                                          (MediaQuery.of(context).size.width /
-                                              11),
+                                    Visibility(
+                                      visible: player2Pos ==
+                                          snapshot.data.gridItems[position]
+                                              .position,
+                                      child: SvgPicture.asset(
+                                        'vectors/pawn2.svg',
+                                        fit: BoxFit.fitHeight,
+                                        height:
+                                            (MediaQuery.of(context).size.width /
+                                                11),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        itemCount: snapshot.data.gridItems.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 5),
-                      )
+                            );
+                          },
+                          itemCount: snapshot.data.gridItems.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 5),
+                        );
+                      }),
                     ],
                   ),
-                  Dice(),
+                  GestureDetector(
+                      onTap: startTimeout,
+                      child: StatefulBuilder(builder:
+                          (BuildContext context, StateSetter setState) {
+                        diceState = setState;
+                        return Image.asset(
+                          diceIcons[randomNumber],
+                          height: 80.0,
+                        );
+                      })),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Player 1',
-                      style: TextStyle(fontSize: 18.0, color: Colors.blue),
-                    ),
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      playerLabelState = setState;
+                      return Text(
+                        (player1 ? 'Player 1' : 'Player 2'),
+                        style: TextStyle(fontSize: 18.0, color: Colors.blue),
+                      );
+                    }),
                   )
                 ],
               );
@@ -118,49 +155,37 @@ class MyHomePage extends StatelessWidget {
     }*/
     return gridData;
   }
-}
-
-class Dice extends StatefulWidget {
-  @override
-  DiceState createState() => DiceState();
-}
-
-class DiceState extends State<Dice> {
-  var randomNumber = 0;
-  var diceAnimationCounter = 0;
-  var rnd = new Random();
-  var diceIcons = [
-    'images/one.webp',
-    'images/two.webp',
-    'images/three.webp',
-    'images/four.webp',
-    'images/five.webp',
-    'images/six.webp'
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: startTimeout,
-      child: Image.asset(
-        diceIcons[randomNumber],
-        height: 80.0,
-      ),
-    );
-  }
 
   startTimeout() async {
-    var duration = const Duration(milliseconds: 100);
-    Timer.periodic(duration, (Timer t) => handleTimeout(t));
+    if (!isRunning) {
+      isRunning = true;
+      var duration = const Duration(milliseconds: 100);
+      Timer.periodic(duration, (Timer t) => handleTimeout(t));
+    } else
+      print("Do Nothing");
   }
 
   void handleTimeout(timer) {
-    setState(() {
+    diceState(() {
       randomNumber = rnd.nextInt(5);
     });
     if (diceAnimationCounter > 10) {
       diceAnimationCounter = 0;
       timer.cancel();
+      print('$player1' '$isRunning');
+
+      gridState(() {
+        if (player1)
+          player1Pos += randomNumber + 1;
+        else
+          player2Pos += randomNumber + 1;
+      });
+
+      playerLabelState(() {
+        player1 = !player1;
+      });
+
+      isRunning = false;
     } else
       diceAnimationCounter++;
   }
