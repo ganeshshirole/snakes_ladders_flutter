@@ -50,101 +50,98 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
+    print('screen width' + screenWidth.toString());
     return Scaffold(
         body: SafeArea(
-      child: FutureBuilder<GridData>(
-        future: _readJson(),
-        builder: (BuildContext context, AsyncSnapshot<GridData> snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return Text('None');
-            case ConnectionState.active:
-            case ConnectionState.waiting:
-              return Text('Awaiting result...');
-            case ConnectionState.done:
-              if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Stack(
-                    children: <Widget>[
-                      Image.asset('images/snakes_ladders_game_background.webp'),
-                      StatefulBuilder(builder:
-                          (BuildContext context, StateSetter setState) {
-                        gridState = setState;
-                        return GridView.builder(
-                          shrinkWrap: true,
-                          itemBuilder: (context, position) {
-                            return Container(
-                              child: Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Visibility(
-                                      visible: player1Pos ==
-                                          snapshot.data.gridItems[position]
-                                              .position,
-                                      child: SvgPicture.asset(
-                                        'vectors/pawn1.svg',
-                                        fit: BoxFit.fitHeight,
-                                        width:
-                                            (MediaQuery.of(context).size.width /
-                                                11),
-                                      ),
-                                    ),
-                                    Visibility(
-                                      visible: player2Pos ==
-                                          snapshot.data.gridItems[position]
-                                              .position,
-                                      child: SvgPicture.asset(
-                                        'vectors/pawn2.svg',
-                                        fit: BoxFit.fitHeight,
-                                        height:
-                                            (MediaQuery.of(context).size.width /
-                                                11),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                          itemCount: snapshot.data.gridItems.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 5),
-                        );
-                      }),
-                    ],
-                  ),
-                  GestureDetector(
-                      onTap: startTimeout,
-                      child: StatefulBuilder(builder:
-                          (BuildContext context, StateSetter setState) {
-                        diceState = setState;
-                        return Image.asset(
-                          diceIcons[randomNumber],
-                          height: 80.0,
-                        );
-                      })),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: StatefulBuilder(
+            child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Stack(
+          children: <Widget>[
+            Image.asset('images/snakes_ladders_game_background.webp'),
+            FutureBuilder<GridData>(
+              future: _readJson(),
+              builder:
+                  (BuildContext context, AsyncSnapshot<GridData> snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                    return Text('None');
+                  case ConnectionState.active:
+                  case ConnectionState.waiting:
+                    return Text('Awaiting result...');
+                  case ConnectionState.done:
+                    if (snapshot.hasError)
+                      return Text('Error: ${snapshot.error}');
+                    return StatefulBuilder(
                         builder: (BuildContext context, StateSetter setState) {
-                      playerLabelState = setState;
-                      return Text(
-                        (player1 ? 'Player 1' : 'Player 2'),
-                        style: TextStyle(fontSize: 18.0, color: Colors.blue),
+                      gridState = setState;
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        itemBuilder: (context, position) {
+                          return Container(
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Visibility(
+                                    visible: player1Pos == snapshot.data.gridItems[position].position,
+                                    child: SvgPicture.asset(
+                                      'vectors/pawn1.svg',
+                                      fit: BoxFit.fitHeight,
+                                      width: screenWidth / 11,
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: player2Pos ==
+                                        snapshot
+                                            .data.gridItems[position].position,
+                                    child: SvgPicture.asset(
+                                      'vectors/pawn2.svg',
+                                      fit: BoxFit.fitHeight,
+                                      height:
+                                      screenWidth / 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                        itemCount: snapshot.data.gridItems.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 5),
                       );
-                    }),
-                  )
-                ],
+                    });
+                }
+                return null; // unreachable
+              },
+            ),
+          ],
+        ),
+        GestureDetector(
+            onTap: startTimeout,
+            child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+              diceState = setState;
+              return Image.asset(
+                diceIcons[randomNumber],
+                height: 80.0,
               );
-          }
-          return null; // unreachable
-        },
-      ),
-    ));
+            })),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            playerLabelState = setState;
+            return Text(
+              (player1 ? 'Player 1' : 'Player 2'),
+              style: TextStyle(fontSize: 18.0, color: Colors.blue),
+            );
+          }),
+        )
+      ],
+    )));
   }
 
   Future<GridData> _readJson() async {
