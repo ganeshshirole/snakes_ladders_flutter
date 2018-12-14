@@ -27,15 +27,23 @@ class MyHomePage extends StatelessWidget {
   StateSetter gridState;
   StateSetter diceState;
   StateSetter playerLabelState;
+  BuildContext context;
 
   final String title;
+
   var player1Pos = 1;
   var player2Pos = 1;
+
+  var player1GotoPos = 0;
+  var player2GotoPos = 0;
 
   var isRunning = false;
   var randomNumber = 0;
   var player1 = true;
+
   var diceAnimationCounter = 0;
+  var moveAnimationCounter = 0;
+
   var rnd = new Random();
   var diceIcons = [
     'images/one.webp',
@@ -50,8 +58,8 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    this.context = context;
     var screenWidth = MediaQuery.of(context).size.width;
-    print('screen width' + screenWidth.toString());
     return Scaffold(
         body: SafeArea(
             child: Column(
@@ -79,13 +87,25 @@ class MyHomePage extends StatelessWidget {
                       return GridView.builder(
                         shrinkWrap: true,
                         itemBuilder: (context, position) {
+                          if (player1) {
+                            if (player1Pos ==
+                                snapshot.data.gridItems[position].position)
+                              player1GotoPos = snapshot
+                                  .data.gridItems[position].goToPosition;
+                          } else if (player2Pos ==
+                              snapshot.data.gridItems[position].position)
+                            player2GotoPos =
+                                snapshot.data.gridItems[position].goToPosition;
+
                           return Container(
                             child: Center(
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Visibility(
-                                    visible: player1Pos == snapshot.data.gridItems[position].position,
+                                    visible: player1Pos ==
+                                        snapshot
+                                            .data.gridItems[position].position,
                                     child: SvgPicture.asset(
                                       'vectors/pawn1.svg',
                                       fit: BoxFit.fitHeight,
@@ -99,8 +119,7 @@ class MyHomePage extends StatelessWidget {
                                     child: SvgPicture.asset(
                                       'vectors/pawn2.svg',
                                       fit: BoxFit.fitHeight,
-                                      height:
-                                      screenWidth / 11,
+                                      height: screenWidth / 11,
                                     ),
                                   ),
                                 ],
@@ -147,9 +166,6 @@ class MyHomePage extends StatelessWidget {
   Future<GridData> _readJson() async {
     var jsonString = await rootBundle.loadString('assets/grid_data.json');
     GridData gridData = GridData.fromJson(jsonDecode(jsonString));
-    /*for (GridItem gridItem in gridData.gridItems) {
-      print(gridItem.position.toString() + "\n");
-    }*/
     return gridData;
   }
 
@@ -157,33 +173,122 @@ class MyHomePage extends StatelessWidget {
     if (!isRunning) {
       isRunning = true;
       var duration = const Duration(milliseconds: 100);
-      Timer.periodic(duration, (Timer t) => handleTimeout(t));
-    } else
-      print("Do Nothing");
+      Timer.periodic(
+          duration, (Timer diceTimer) => handleDiceTimeout(diceTimer));
+    }
   }
 
-  void handleTimeout(timer) {
+  handleDiceTimeout(diceTimer) {
     diceState(() {
-      randomNumber = rnd.nextInt(5);
+      randomNumber = rnd.nextInt(6);
     });
     if (diceAnimationCounter > 10) {
       diceAnimationCounter = 0;
-      timer.cancel();
-      print('$player1' '$isRunning');
+      diceTimer.cancel();
 
-      gridState(() {
-        if (player1)
-          player1Pos += randomNumber + 1;
-        else
-          player2Pos += randomNumber + 1;
-      });
+      var playerPos = player1 ? player1Pos : player2Pos;
+      if (playerPos == 1)
+        movesTimer(randomNumber == 0);
+      else
+        movesTimer((playerPos + randomNumber + 1) <= 25);
+    } else
+      diceAnimationCounter += 1;
+  }
 
+  movesTimer(bool start) {
+    if (start) {
+      var duration = const Duration(milliseconds: 500);
+      Timer.periodic(
+          duration, (Timer movesTimer) => handleMoveTimeout(movesTimer));
+    } else {
       playerLabelState(() {
         player1 = !player1;
       });
 
       isRunning = false;
+    }
+  }
+
+  handleMoveTimeout(Timer movesTimer) {
+    if (moveAnimationCounter <= randomNumber) {
+      moveAnimationCounter += 1;
+      gridState(() {
+        if (player1)
+          player1Pos += 1;
+        else
+          player2Pos += 1;
+      });
+    } else if (moveAnimationCounter == (randomNumber + 1)) {
+      moveAnimationCounter += 1;
+      if (player1) {
+        if (player1GotoPos != 0) {
+          gridState(() {
+            player1Pos = player1GotoPos;
+          });
+        } else
+          stopMoveAnimation(movesTimer);
+      } else {
+        if (player2GotoPos != 0) {
+          gridState(() {
+            player2Pos = player2GotoPos;
+          });
+        } else
+          stopMoveAnimation(movesTimer);
+      }
     } else
-      diceAnimationCounter++;
+      stopMoveAnimation(movesTimer);
+  }
+
+  stopMoveAnimation(moveTimer) {
+    moveAnimationCounter = 0;
+    moveTimer.cancel();
+
+    isRunning = false;
+
+    // Player win
+    if (player1Pos == 25 || player2Pos == 25)
+      _showDialog();
+    else {
+      playerLabelState(() {
+        player1 = !player1;
+      });
+    }
+  }
+
+  // reset if position 25
+  reset() {
+    playerLabelState(() {
+      player1 = true;
+    });
+    gridState(() {
+      player1Pos = 1;
+      player2Pos = 1;
+    });
+    Navigator.of(context).pop();
+  }
+
+  // user defined function
+  void _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text('Player ' + (player1 ? '1' : '2') + ' Winner'),
+          content: new Text(
+              "Congrats on your win, congrats on your fearless effort; congrats on your achievements and wish you many congrats for your future. Always have faith in you and have courage to win any challenge that comes your way. Congratulation."),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Thanks"),
+              onPressed: () {
+                reset();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
