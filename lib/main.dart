@@ -26,7 +26,8 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   StateSetter gridState;
   StateSetter diceState;
-  StateSetter playerLabelState;
+
+//  StateSetter playerLabelState;
   BuildContext context;
 
   final String title;
@@ -63,101 +64,132 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
         body: SafeArea(
             child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        Stack(
-          children: <Widget>[
-            Image.asset('images/snakes_ladders_game_background.webp'),
-            FutureBuilder<GridData>(
-              future: _readJson(),
-              builder:
-                  (BuildContext context, AsyncSnapshot<GridData> snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.none:
-                    return Text('None');
-                  case ConnectionState.active:
-                  case ConnectionState.waiting:
-                    return Text('Awaiting result...');
-                  case ConnectionState.done:
-                    if (snapshot.hasError)
-                      return Text('Error: ${snapshot.error}');
-                    return StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
-                      gridState = setState;
-                      return GridView.builder(
-                        shrinkWrap: true,
-                        itemBuilder: (context, position) {
-                          if (player1) {
-                            if (player1Pos ==
-                                snapshot.data.gridItems[position].position)
-                              player1GotoPos = snapshot
-                                  .data.gridItems[position].goToPosition;
-                          } else if (player2Pos ==
-                              snapshot.data.gridItems[position].position)
-                            player2GotoPos =
-                                snapshot.data.gridItems[position].goToPosition;
-
-                          return Container(
-                            child: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Visibility(
-                                    visible: player1Pos ==
-                                        snapshot
-                                            .data.gridItems[position].position,
-                                    child: SvgPicture.asset(
-                                      'vectors/pawn1.svg',
-                                      fit: BoxFit.fitHeight,
-                                      width: screenWidth / 11,
-                                    ),
-                                  ),
-                                  Visibility(
-                                    visible: player2Pos ==
-                                        snapshot
-                                            .data.gridItems[position].position,
-                                    child: SvgPicture.asset(
-                                      'vectors/pawn2.svg',
-                                      fit: BoxFit.fitHeight,
-                                      height: screenWidth / 11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                        itemCount: snapshot.data.gridItems.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 5),
-                      );
-                    });
-                }
-                return null; // unreachable
-              },
-            ),
-          ],
-        ),
-        GestureDetector(
-            onTap: startTimeout,
-            child: StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-              diceState = setState;
-              return Image.asset(
-                diceIcons[randomNumber],
-                height: 80.0,
-              );
-            })),
         Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            playerLabelState = setState;
-            return Text(
-              (player1 ? 'Player 1' : 'Player 2'),
-              style: TextStyle(fontSize: 18.0, color: Colors.blue),
-            );
-          }),
+          padding: const EdgeInsets.all(10.0),
+          child: Stack(
+            children: <Widget>[
+              Image.asset('images/snakes_ladders_game_background.webp'),
+              FutureBuilder<GridData>(
+                future: _readJson(),
+                builder:
+                    (BuildContext context, AsyncSnapshot<GridData> snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                      return Text('None');
+                    case ConnectionState.active:
+                    case ConnectionState.waiting:
+                      return Text('Awaiting result...');
+                    case ConnectionState.done:
+                      if (snapshot.hasError)
+                        return Text('Error: ${snapshot.error}');
+                      return StatefulBuilder(builder:
+                          (BuildContext context, StateSetter setState) {
+                        gridState = setState;
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          itemBuilder: (context, position) {
+                            if (player1) {
+                              if (player1Pos ==
+                                  snapshot.data.gridItems[position].position)
+                                player1GotoPos = snapshot
+                                    .data.gridItems[position].goToPosition;
+                            } else if (player2Pos ==
+                                snapshot.data.gridItems[position].position)
+                              player2GotoPos = snapshot
+                                  .data.gridItems[position].goToPosition;
+
+                            return Container(
+                              child: Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Visibility(
+                                      visible: player1Pos ==
+                                          snapshot.data.gridItems[position]
+                                              .position,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(2.0),
+                                        child: SvgPicture.asset(
+                                          'vectors/pawn1.svg',
+                                          fit: BoxFit.fitHeight,
+                                          width: screenWidth / 14,
+                                        ),
+                                      ),
+                                    ),
+                                    Visibility(
+                                      visible: player2Pos ==
+                                          snapshot.data.gridItems[position]
+                                              .position,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(2.0),
+                                        child: SvgPicture.asset(
+                                          'vectors/pawn2.svg',
+                                          fit: BoxFit.fitHeight,
+                                          height: screenWidth / 12,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          itemCount: snapshot.data.gridItems.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 5),
+                        );
+                      });
+                  }
+                  return null; // unreachable
+                },
+              ),
+            ],
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                SvgPicture.asset(
+                  'vectors/pawn1_no_shadow.svg',
+                  fit: BoxFit.fitHeight,
+                  width: screenWidth / 14,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text('Player 1', style: TextStyle(color: Colors.red, fontSize: 16, fontWeight: FontWeight.bold),),
+                )
+              ],
+            ),
+            GestureDetector(
+                onTap: startTimeout,
+                child: StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                  diceState = setState;
+                  return Image.asset(
+                    diceIcons[randomNumber],
+                    height: 70.0,
+                    width: 70.0,
+                  );
+                })),
+            Column(
+              children: <Widget>[
+                SvgPicture.asset(
+                  'vectors/pawn2_no_shadow.svg',
+                  fit: BoxFit.fitHeight,
+                  width: screenWidth / 14,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text('Player 2', style: TextStyle(color: Colors.lightBlue, fontSize: 16, fontWeight: FontWeight.bold),),
+                )
+              ],
+            )
+          ],
         )
       ],
     )));
@@ -201,9 +233,9 @@ class MyHomePage extends StatelessWidget {
       Timer.periodic(
           duration, (Timer movesTimer) => handleMoveTimeout(movesTimer));
     } else {
-      playerLabelState(() {
-        player1 = !player1;
-      });
+//      playerLabelState(() {
+      player1 = !player1;
+//      });
 
       isRunning = false;
     }
@@ -246,31 +278,30 @@ class MyHomePage extends StatelessWidget {
     isRunning = false;
 
     // Player win
-    if (player1Pos == 25 || player2Pos == 25)
+    if (player1Pos == 25 || player2Pos == 25) {
       _showDialog();
-    else {
-      playerLabelState(() {
-        player1 = !player1;
-      });
+    } else {
+//      playerLabelState(() {
+      player1 = !player1;
+//      });
     }
   }
 
   // reset if position 25
   reset() {
-    playerLabelState(() {
-      player1 = true;
-    });
+//    playerLabelState(() {
+    player1 = true;
+//    });
     gridState(() {
       player1Pos = 1;
       player2Pos = 1;
     });
-    Navigator.of(context).pop();
   }
 
   // user defined function
-  void _showDialog() {
+  _showDialog() async {
     // flutter defined function
-    showDialog(
+    var action = await showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
@@ -283,12 +314,20 @@ class MyHomePage extends StatelessWidget {
             new FlatButton(
               child: new Text("Thanks"),
               onPressed: () {
-                reset();
+                Navigator.of(context).pop("Thanks");
               },
             ),
           ],
         );
       },
     );
+
+    if (action == null) {
+      print('Do nothing.');
+      reset();
+    } else if (action == 'Thanks') {
+      print('Thanks');
+      reset();
+    }
   }
 }
