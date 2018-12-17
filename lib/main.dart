@@ -14,11 +14,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Game',
+      title: 'Snakes Ladders',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Home Page'),
+      home: MyHomePage(title: 'Snakes Ladders'),
     );
   }
 }
@@ -55,10 +55,20 @@ class MyHomePage extends StatelessWidget {
     'images/six.webp'
   ];
 
+  static const ANIMATE_PADDING = 6.0;
+  var animated1Padding = ANIMATE_PADDING;
+  var animated2Padding = ANIMATE_PADDING;
+
+  StateSetter player1State;
+  StateSetter player2State;
+
+  static const animationDuration = const Duration(milliseconds: 500);
+
   MyHomePage({Key key, this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    initPlayerState();
     this.context = context;
     var screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -154,14 +164,25 @@ class MyHomePage extends StatelessWidget {
           children: <Widget>[
             Column(
               children: <Widget>[
-                SvgPicture.asset(
-                  'vectors/pawn1_no_shadow.svg',
-                  fit: BoxFit.fitHeight,
-                  width: screenWidth / 14,
-                ),
+                StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                  player1State = setState;
+                  return AnimatedContainer(
+                      padding: EdgeInsets.all(animated1Padding),
+                      child: SvgPicture.asset(
+                        'vectors/pawn1_no_shadow.svg',
+                        fit: BoxFit.fitHeight,
+                      ),
+                      duration: animationDuration,
+                      height: screenWidth / 10,
+                      width: screenWidth / 10);
+                }),
                 Padding(
                   padding: const EdgeInsets.all(4.0),
-                  child: Text('Player 1', style: TextStyle(color: Colors.red, fontSize: 16, fontWeight: FontWeight.bold),),
+                  child: Text(
+                    'Player 1',
+                    style: TextStyle(color: Colors.red, fontSize: 15),
+                  ),
                 )
               ],
             ),
@@ -172,20 +193,31 @@ class MyHomePage extends StatelessWidget {
                   diceState = setState;
                   return Image.asset(
                     diceIcons[randomNumber],
-                    height: 70.0,
-                    width: 70.0,
+                    height: 68.0,
+                    width: 68.0,
                   );
                 })),
             Column(
               children: <Widget>[
-                SvgPicture.asset(
-                  'vectors/pawn2_no_shadow.svg',
-                  fit: BoxFit.fitHeight,
-                  width: screenWidth / 14,
-                ),
+                StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                  player2State = setState;
+                  return AnimatedContainer(
+                      padding: EdgeInsets.all(animated2Padding),
+                      child: SvgPicture.asset(
+                        'vectors/pawn2_no_shadow.svg',
+                        fit: BoxFit.fitHeight,
+                      ),
+                      duration: animationDuration,
+                      height: screenWidth / 10,
+                      width: screenWidth / 10);
+                }),
                 Padding(
                   padding: const EdgeInsets.all(4.0),
-                  child: Text('Player 2', style: TextStyle(color: Colors.lightBlue, fontSize: 16, fontWeight: FontWeight.bold),),
+                  child: Text(
+                    'Player 2',
+                    style: TextStyle(color: Colors.lightBlue, fontSize: 15),
+                  ),
                 )
               ],
             )
@@ -328,6 +360,36 @@ class MyHomePage extends StatelessWidget {
     } else if (action == 'Thanks') {
       print('Thanks');
       reset();
+    }
+  }
+
+  initPlayerState() {
+    print("initPlayerStates");
+    Timer.periodic(animationDuration, (Timer t) => change());
+  }
+
+  change() {
+    if (player1State != null) {
+      player1State(() {
+        if (player1 && !isRunning) {
+          if (animated1Padding == ANIMATE_PADDING)
+            animated1Padding = 0.0;
+          else
+            animated1Padding = ANIMATE_PADDING;
+        } else animated1Padding = ANIMATE_PADDING;
+      });
+    }
+
+    if (player2State != null) {
+      player2State(() {
+        if (!player1 && !isRunning) {
+          if (animated2Padding == ANIMATE_PADDING)
+            animated2Padding = 0.0;
+          else
+            animated2Padding = ANIMATE_PADDING;
+        } else
+          animated2Padding = ANIMATE_PADDING;
+      });
     }
   }
 }

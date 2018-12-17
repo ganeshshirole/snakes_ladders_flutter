@@ -1,4 +1,4 @@
-package com.accretion.snakesladders
+package com.snakes_ladder.dice
 
 import android.os.Bundle
 
