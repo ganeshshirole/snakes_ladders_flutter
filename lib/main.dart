@@ -27,7 +27,6 @@ class MyHomePage extends StatelessWidget {
   StateSetter gridState;
   StateSetter diceState;
 
-//  StateSetter playerLabelState;
   BuildContext context;
 
   final String title;
@@ -265,9 +264,7 @@ class MyHomePage extends StatelessWidget {
       Timer.periodic(
           duration, (Timer movesTimer) => handleMoveTimeout(movesTimer));
     } else {
-//      playerLabelState(() {
       player1 = !player1;
-//      });
 
       isRunning = false;
     }
@@ -313,17 +310,13 @@ class MyHomePage extends StatelessWidget {
     if (player1Pos == 25 || player2Pos == 25) {
       _showDialog();
     } else {
-//      playerLabelState(() {
       player1 = !player1;
-//      });
     }
   }
 
   // reset if position 25
   reset() {
-//    playerLabelState(() {
     player1 = true;
-//    });
     gridState(() {
       player1Pos = 1;
       player2Pos = 1;
@@ -376,7 +369,8 @@ class MyHomePage extends StatelessWidget {
             animated1Padding = 0.0;
           else
             animated1Padding = ANIMATE_PADDING;
-        } else animated1Padding = ANIMATE_PADDING;
+        } else
+          animated1Padding = ANIMATE_PADDING;
       });
     }
 
