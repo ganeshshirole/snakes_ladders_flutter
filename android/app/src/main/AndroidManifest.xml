@@ -20,6 +20,7 @@
             android:name="com.snakes_ladder.dice.MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
+            android:screenOrientation="portrait"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
